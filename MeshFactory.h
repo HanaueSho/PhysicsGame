@@ -67,6 +67,14 @@ struct CylinderParams
 	bool insideOut = false;	// 反転
 };
 
+// リンゴ
+struct AppleParams
+{
+	float radius = 1.0f;
+	int slices = 6; // 横分割（経度）
+	int stacks = 6; // 縦分割（緯度）
+	bool insideOut = false; // true: 内側
+};
 
 
 class MeshFactory
@@ -75,9 +83,14 @@ public:
 	static void CreateQuad	  (MeshFilterComponent* filter, const QuadParams& p = {});
 	static void CreatePlane   (MeshFilterComponent* filter, const PlaneParams& p = {});
 	static void CreateSphere  (MeshFilterComponent* filter, const SphereParams& p = {});
+	// ----- CubeParams -----
+	// Vector3 size 
+	// bool originCenter : true = 中心原点, false = 左上原点
+	// bool insideOut : true : 内側
 	static void CreateCube	  (MeshFilterComponent* filter, const CubeParams& p = {});
 	static void CreateCylinder(MeshFilterComponent* filter, const CylinderParams& p = {});
 	static void CreateCapsule (MeshFilterComponent* filter, const CapsuleParams& p = {});
+	static void CreateApple   (MeshFilterComponent* filter, const AppleParams& p = {});
 };
 
 

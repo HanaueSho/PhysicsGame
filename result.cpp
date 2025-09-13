@@ -16,6 +16,8 @@
 
 void Result::Init()
 {
+	Scene::Init();
+	
 	Camera* pCamera = AddGameObject<Camera>(0);
 
 	float scale = 0.4f;

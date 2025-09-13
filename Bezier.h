@@ -57,9 +57,6 @@ private:
 			result *= i;
 		return result;
 	}
-
 };
-
-
 
 #endif

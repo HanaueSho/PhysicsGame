@@ -466,7 +466,84 @@ bool SphereCollision::isOverlap(const Transform& myTrans, const Collision& colli
 
 bool SphereCollision::isOverlapWithBox(const Transform& myTrans, const BoxCollision& box, const Transform& transBox, ContactManifold& out, float slop) const
 {
-	return box.isOverlapWithSphere(transBox, *this, myTrans, out, slop);
+	// ----- OBBの世界軸を取得 -----
+	const Vector3 aX = transBox.GetRight();
+	const Vector3 aY = transBox.GetUp();
+	const Vector3 aZ = transBox.GetForward();
+
+	// ----- 半エクステント（スケール反映） -----
+	Vector3 extent = {
+		fabsf(transBox.scale.x) * box.HalfSize().x,
+		fabsf(transBox.scale.y) * box.HalfSize().y,
+		fabsf(transBox.scale.z) * box.HalfSize().z,
+	};
+
+	// ----- 球の中心と半径取得 -----
+	const Vector3 centerSph = myTrans.position;
+	const Vector3 centerBox = transBox.position;
+	const float   radius = this->Radius() * fabsf(myTrans.scale.x); // 一旦 scale.x でスケーリング
+
+	// ----- 箱中心→球中心へのベクトルを箱の軸に投影 -----
+	const Vector3 vect = centerSph - centerBox;
+	const Vector3 dist = {
+		Vector3::Dot(vect, aX),
+		Vector3::Dot(vect, aY),
+		Vector3::Dot(vect, aZ)
+	};
+
+	// ----- 最近接点のローカル座標（Clamp）-----
+	auto Clamp = [](float a, float min, float max)
+		{
+			float result = a;
+			result = std::min(a, max);
+			result = std::max(result, min);
+			return result;
+		};
+	float qx = Clamp(dist.x, -extent.x, extent.x);
+	float qy = Clamp(dist.y, -extent.y, extent.y);
+	float qz = Clamp(dist.z, -extent.z, extent.z);
+
+	// ----- ワールド最近接点 -----
+	Vector3 qWorld = centerBox + aX * qx + aY * qy + aZ * qz; // 接触点の計算
+
+	// ----- 球中心　→　最近接点ベクトル ------
+	const Vector3 vectSphToPoint = centerSph - qWorld;
+	const float distSphToPointSq = vectSphToPoint.lengthSq();
+
+	// 球が箱の内部にある特殊ケース対策
+	Vector3 n;
+	float pen;
+	if (distSphToPointSq > 1e-12f) // 球が箱の外にいる
+	{
+		const float dist = sqrtf(distSphToPointSq);
+		n = vectSphToPoint / dist; // 接触点→球　方向（Box → Sphere）
+		pen = radius - dist; // 正なら重なっている
+	}
+	else // 球が箱の内部
+	{
+		// 最近平面を選ぶ
+		const float dx = extent.x - fabsf(dist.x);
+		const float dy = extent.y - fabsf(dist.y);
+		const float dz = extent.z - fabsf(dist.z);
+		if (dx <= dy && dx <= dz) { n = (dist.x >= 0 ? aX : -aX); qx = (dist.x >= 0 ? extent.x : -extent.x); } // 一番近くの面の方向を normal にする
+		else if (dy <= dz) { n = (dist.y >= 0 ? aY : -aY); qy = (dist.y >= 0 ? extent.y : -extent.y); }
+		else { n = (dist.z >= 0 ? aZ : -aZ); qz = (dist.z >= 0 ? extent.z : -extent.z); }
+
+		qWorld = centerBox + aX * qx + aY * qy + aZ * qz; // 接触点の再計算
+		pen = radius + std::min(dx, std::min(dy, dz)); // 正で重なっている
+	}
+	// 接触しているかの判定
+	const bool touching = (pen >= -slop);
+
+	// ----- ContactManifold の出力 -----
+	out.touching = touching;
+	out.normal = n; // Sphere → Box
+	out.count = 1;
+	out.points[0].penetration = pen;
+	out.points[0].pointOnA = centerSph + out.normal * radius;
+	out.points[0].pointOnB = qWorld;
+
+	return touching;
 }
 
 // --------------------------------------------------

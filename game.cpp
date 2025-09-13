@@ -16,6 +16,7 @@
 #include "score.h"
 #include "audio.h"
 #include "renderer.h"
+#include "AppleObject.h"
 
 #include "DebugRotateComponent.h"
 
@@ -36,31 +37,14 @@ void Game::Init()
 	// プレイヤー -----
 	Player* pPlayer = AddGameObject<Player>(1);
 	pPlayer->Init();
-	pPlayer->Transform()->SetWorldPosition({ 5, 0, 0 });
-	pPlayer->Transform()->SetEulerAngles({ 0, 0, 0 });
-	
-	for (int x = 0; x < 6; x++)
-	{
-		for (int z = 0; z < 6; z++)
-		{
-			pPlayer = AddGameObject<Player>(1);
-			pPlayer->Init();
-			pPlayer->Transform()->SetWorldPosition({ -6.0f + x * 2.0f, 0, -8.0f + z * 2.0f});
-		}
-	}
-
-	// 床 ------
-	//Field* pField = AddGameObject<Field>(1);
-	//pField->Init();
 	
 	// エネミー -----
 	Enemy* pEnemy = AddGameObject<Enemy>(1);
 	pEnemy->Init();
-	pEnemy->Transform()->SetPosition({0, 0, 0});
-	pEnemy->Transform()->SetEulerAngles({30, 30, 30});
+	pEnemy->Transform()->SetScale({ 1.0f, 1.0f, 1.0f });
+	pEnemy->Transform()->SetPosition({0, 0, 5});
+	pEnemy->Transform()->SetEulerAngles({1.7f, 1.7f, 1.7f });
 	//pEnemy->Transform()->SetWorldRotation(Quaternion::FromEulerAngles({0, 0, 0}));
-
-	pPlayer->AddComponent<DebugRotateComponent>()->SetObject(pEnemy);
 
 	//pEnemy->Transform()->SetParent(pPlayer->Transform()); 
 
@@ -74,6 +58,7 @@ void Game::Init()
 	pEnemy->Init();
 	pEnemy->Transform()->SetPosition({ 0, -10, 0 });
 	pEnemy->Transform()->SetScale({ 10, 5, 10 });
+	pEnemy->Transform()->SetEulerAngles({ 0, 0, 0 });
 	pEnemy->GetComponent<Collider>()->SetBox({ 1, 1, 1 });
 	pEnemy->GetComponent<Rigidbody>()->SetBodyType(Rigidbody::BodyType::Static); // 壁
 
@@ -106,37 +91,19 @@ void Game::Init()
 	pEnemy->GetComponent<Collider>()->SetBox({ 1, 1, 1 });
 	pEnemy->GetComponent<Rigidbody>()->SetBodyType(Rigidbody::BodyType::Static); // 壁
 
-	/*										                 
-	FollowCamera* pCamera = AddGameObject<FollowCamera>(0);
+	for (int x = 0; x < 1; x++)
+	{
+		for (int z = 0; z < 2; z++)
+		{
+			AppleObject* pApple = AddGameObject<AppleObject>(1);
+			pApple->Init();
+			pApple->Transform()->SetWorldPosition({ -0.0f + x * 0.5f, 0, -0.0f + z * 0.5f });
+		}
+	}
 
-	Field* pField = AddGameObject<Field>(0);
-	pField->Init();
-	Player* pPlayer = AddGameObject<Player>(1);
-	pPlayer->Init();
-	pCamera->SetTarget(pPlayer);
 
-	Enemy* pEnemy = AddGameObject<Enemy>(1);
-	pEnemy->Init();
-	pEnemy->SetPosition({ 0, 0, 5 });
-	pEnemy = AddGameObject<Enemy>(1);
-	pEnemy->Init();
-	pEnemy->SetPosition({ 4, 0, 5 });
-	pEnemy = AddGameObject<Enemy>(1);
-	pEnemy->Init();
-	pEnemy->SetPosition({ -4, 0, 5 });
 
-	Polygon2D* pPolygon = AddGameObject<Polygon2D>(2);
-	pPolygon->Init({ 250, 0 ,0 }, { 0, 0, 90 }, {1, 1, 1});
-
-	Score* pScore = AddGameObject<Score>(2);
-	pScore->Init({ 250, 250 ,0 }, { 0, 0, 0 }, { 1, 1, 1 });
-
-	// BGM再生
-	m_pBGM = new Audio();
-	m_pBGM->Load("assets\\audio\\bgm.wav");
-	//m_pBGM->Play(true);
-	*/
-
+	// ライトの設定 -----
 	LIGHT light = {};
 	light.Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	light.Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);

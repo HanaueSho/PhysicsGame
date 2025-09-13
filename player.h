@@ -21,6 +21,7 @@ class Audio;
 class Player : public GameObject
 {
 private:
+	GameObject* m_pCubes[5];
 	class Audio* m_pSE;
 
 public:

@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppleObject.cpp" />
     <ClCompile Include="audio.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Collision.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="field.cpp" />
@@ -187,6 +189,7 @@
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppleObject.h" />
     <ClInclude Include="audio.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="bullet.h" />
@@ -198,6 +201,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="component.h" />
     <ClInclude Include="ContactManifold.h" />
+    <ClInclude Include="CubeObject.h" />
     <ClInclude Include="DebugRotateComponent.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="Explosion.h" />

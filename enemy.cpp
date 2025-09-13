@@ -57,38 +57,51 @@ void Enemy::Init()
 	// Rigidbody
 	Rigidbody* rigid = AddComponent<Rigidbody>();
 	rigid->ComputeBoxInertia({ 1, 1, 1 }, 1);
+	//rigid->SetBodyType(Rigidbody::BodyType::Kinematic);
 	rigid->AddForce({ 0, 500, 0 });
-	rigid->SetMass(5);
+	rigid->SetMass(1);
 }
 
 void Enemy::Update(float dt)
 {
 	GameObject::Update(dt);
 
-	float weight = 5.0f;
+	float weight = 2.0f;
+	float value = 0.1f;
+	Vector3 vect{};
+	GetComponent<Rigidbody>()->AddTorque({ 0, 10.0f, 0});
 
 	if (Keyboard_IsKeyDownTrigger(KK_SPACE))
 	{
 		GetComponent<Rigidbody>()->AddForce({0, 200 * weight, 0});
-		//GetComponent<Rigidbody>()->AddTorque({ 10.0f, 0, 10 });
+		vect.y += value;
+	}
+	if (Keyboard_IsKeyDownTrigger(KK_LEFTSHIFT))
+	{
+		GetComponent<Rigidbody>()->AddForce({ 0, 200 * weight, 0 });
+		vect.y -= value;
 	}
 	if (Keyboard_IsKeyDownTrigger(KK_LEFT))
 	{
 		GetComponent<Rigidbody>()->AddForce({ -300 * weight, 0, 0});
+		vect.x -= value;
 	}
 	if (Keyboard_IsKeyDownTrigger(KK_RIGHT))
 	{
 		GetComponent<Rigidbody>()->AddForce({ 300 * weight, 0, 0 });
+		vect.x += value;
 	}
 	if (Keyboard_IsKeyDownTrigger(KK_UP))
 	{
 		GetComponent<Rigidbody>()->AddForce({ 0, 0, 300 * weight });
+		vect.z += value;
 	}
 	if (Keyboard_IsKeyDownTrigger(KK_DOWN))
 	{
 		GetComponent<Rigidbody>()->AddForce({ 0, 0, -300 * weight });
+		vect.z -= value;
 	}
-
+	//Transform()->SetPosition(Transform()->Position() + vect);
 
 	if (Keyboard_IsKeyDownTrigger(KK_D1))
 		GetComponent<Rigidbody>()->AddTorque({ 0.0f, 0, 100 });

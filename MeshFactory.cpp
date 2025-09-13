@@ -10,6 +10,7 @@
 #include <vector>
 #include "MeshFactory.h"
 #include "MathCommon.h"
+#include "Bezier.h"
 
 
 template<class T> inline T Lerp(T a, T b, T t) { return a + (b - a) * t; }
@@ -706,4 +707,188 @@ void MeshFactory::CreateCapsule(MeshFilterComponent* filter, const CapsuleParams
 	filter->SetVertexBuffer(vb, sizeof(VERTEX_3D), (UINT)vertexes.size(), 0, true);
 	filter->SetIndexBuffer(ib, (UINT)idx.size(), DXGI_FORMAT_R32_UINT, true);
 	filter->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void MeshFactory::CreateApple(MeshFilterComponent* filter, const AppleParams& p)
+{
+	assert(filter);
+
+	// ガード
+	const uint32_t slices = std::max<uint32_t>(3, p.slices);
+	const uint32_t stacks = std::max<uint32_t>(3, p.stacks);
+	const float R = std::max<float>(0.0f, p.radius);
+	if (R == 0) return; // 半径０はリターン
+
+	// 断面ベジェ生成 -----
+	Bezier bezier;
+	bezier.CreatePoint(Vector3(0.00f * R, -1.00f * R, 0)); // 
+	bezier.CreatePoint(Vector3(1.30f * R, -1.10f * R, 0)); // 
+	bezier.CreatePoint(Vector3(0.90f * R,  0.00f * R, 0)); // 
+	bezier.CreatePoint(Vector3(1.50f * R,  0.90f * R, 0)); // 
+	bezier.CreatePoint(Vector3(0.50f * R,  1.00f * R, 0)); // 
+	bezier.CreatePoint(Vector3(0.00f * R,  0.70f * R, 0)); // 
+	bezier.CreatePoint(Vector3(0.00f * R,  0.50f * R, 0)); // 
+
+	// 導関数近似 （ベジェ曲線の接ベクトルを求める）-----
+	auto BezierDeriv = [&](float t)->Vector3
+		{
+			// 端点の数値安定を少し良くするクランプ＋中心差分
+			t = std::min(1.0f, std::max(0.0f, t));
+			const float dt = 1e-3f;
+			float t0 = std::max(0.0f, t - dt);
+			float t1 = std::min(1.0f, t + dt);
+			Vector3 p0 = bezier.GetValue(t0);
+			Vector3 p1 = bezier.GetValue(t1);
+			float inv = (t1 - t0) > 0 ? 1.0f / (t1 - t0) : 0.0f;
+			return (p1 - p0) * inv; // XY に有効（Zは常に０）
+		};
+
+	// ｔサンプル列＆弧長パラメータｖ（縦ストレッチ抑制）-----
+	std::vector<float> tSamples(stacks + 1);
+	for (uint32_t i = 0; i <= stacks; i++) tSamples[i] = (float)i / (float)stacks;
+
+	// 粗積分で弧長（累積長）→Vに正規化
+	const int integN = 512; // ０～１の区間を分割する解像度
+	std::vector<float> cum(integN + 1, 0.0f);
+	{
+		Vector3 prev = bezier.GetValue(0.0f);
+		for (int i = 1; i <= integN; i++)
+		{
+			float tt = (float)i / integN;
+			Vector3 curr = bezier.GetValue(tt);
+			Vector3 d = curr - prev;
+			cum[i] = cum[i - 1] + d.length();
+			prev = curr;
+		}
+		if (cum.back() <= 1e-8f)
+			for (int i = 0; i <= integN; i++) cum[i] = (float)i / integN;
+	}
+
+	// 任意の点 t を弧長に基づく０～１の割り合いに写像
+	auto ArcV = [&](float t)->float
+		{
+			float ft = t * integN;
+			int i0 = (int)std::floor(ft);
+			int i1 = std::min(i0 + 1, integN);
+			float a = ft - i0;
+			float c0 = cum[i0], c1 = cum[i1];
+			float total = cum.back();
+			float c = (1 - a) * c0 + a * c1;
+			return total > 0.0f ? (c / total) : t;
+		};
+	std::vector<float> vParam(stacks + 1);
+	for (uint32_t i = 0; i <= stacks; i++) vParam[i] = ArcV(tSamples[i]);
+
+	// 周方向角度テーブル -----
+	std::vector<float> sinP(slices + 1), cosP(slices + 1);
+	for (uint32_t ix = 0; ix <= slices; ix++)
+	{
+		float u = (float)ix / (float)slices;
+		float phi = u * 2.0f * PI;
+		sinP[ix] = std::sinf(phi);
+		cosP[ix] = std::cosf(phi);
+	}
+
+	// 頂点生成 -----
+	const uint32_t vCount = (stacks + 1) * (slices + 1);
+	const uint32_t iCount = stacks * slices * 6;
+	std::vector<VERTEX_3D> vertexes(vCount);
+
+	// 正規化関数
+	auto Normalize2 = [](float x, float y)->XMFLOAT2 {
+		float l = std::sqrt(x * x + y * y);
+		if (l <= 1e-8f) return XMFLOAT2(1, 0);
+		return XMFLOAT2(x / l, y / l);
+		};
+	
+	for (uint32_t iy = 0; iy <= stacks; iy++)
+	{
+		float t = tSamples[iy];
+
+		Vector3 P  = bezier.GetValue(t); // (x, y, 0)
+		Vector3 dP = BezierDeriv(t);	 // (dx, dy, 0)
+
+		float r = std::max(0.0f, P.x);
+		float y = P.y;
+
+		// 法線→外向き法線
+		XMFLOAT2 T2 = Normalize2(dP.x, dP.y);
+		XMFLOAT2 N2 = Normalize2(+T2.y, -T2.x);
+
+		for (uint32_t ix = 0; ix <= slices; ix++)
+		{
+			float cx = cosP[ix], sx = sinP[ix];
+
+			XMFLOAT3 pos(r * cx, y, r * sx);		// 位置
+			XMFLOAT3 n(N2.x * cx, N2.y, N2.x * sx); // 法線
+
+			float nl = std::sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
+			if (nl < 1e-6f) { n = XMFLOAT3(cx, 0, sx); nl = 1.0f; }
+			n.x /= nl; n.y /= nl; n.z /= nl;
+			if (p.insideOut) { n.x = -n.x; n.y = -n.y; n.z = -n.z; }
+
+			float U = (float)ix / (float)slices; // 周方向
+			float Vv = 1.0f - vParam[iy];				 // 縦（弧長基準）
+
+			VERTEX_3D vert{};
+			vert.Position = pos;
+			vert.Normal = n;
+			vert.Diffuse = XMFLOAT4(1, 1, 1, 1);
+			vert.TexCoord = XMFLOAT2(U, Vv);
+
+			vertexes[iy * (slices + 1) + ix] = vert;
+		}
+	}
+
+	// インデックス -----
+	std::vector<uint32_t> idx; idx.reserve(iCount);
+	auto emitTri = [&](uint32_t a, uint32_t b, uint32_t c)
+		{
+			if (!p.insideOut) { idx.push_back(a); idx.push_back(b); idx.push_back(c); }
+			else			  { idx.push_back(a); idx.push_back(c); idx.push_back(b); }
+		};
+	auto emitQuad = [&](uint32_t i00, uint32_t i01, uint32_t i10, uint32_t i11)
+		{
+			emitTri(i00, i10, i01);
+			emitTri(i10, i11, i01);
+		};
+	for (uint32_t iy = 0; iy < stacks; iy++)
+	{
+		for (uint32_t ix = 0; ix < slices; ix++)
+		{
+			uint32_t i00 = iy		* (slices + 1) +  ix;
+			uint32_t i01 = iy		* (slices + 1) + (ix + 1);
+			uint32_t i10 = (iy + 1) * (slices + 1) +  ix;
+			uint32_t i11 = (iy + 1) * (slices + 1) + (ix + 1);
+			emitQuad(i00, i01, i10, i11);
+		}
+	}
+
+	// ----- VB 作成 -----
+	D3D11_BUFFER_DESC vbd{};
+	vbd.Usage = D3D11_USAGE_DEFAULT;
+	vbd.ByteWidth = (UINT)(sizeof(VERTEX_3D) * vertexes.size());
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	D3D11_SUBRESOURCE_DATA vsd{};
+	vsd.pSysMem = vertexes.data();
+	ID3D11Buffer* vb = nullptr;
+	HRESULT hr = Renderer::GetDevice()->CreateBuffer(&vbd, &vsd, &vb);
+	if (FAILED(hr)) { assert(false && "VB failed"); return; }
+
+	// ----- IB 作成 -----
+	D3D11_BUFFER_DESC ibd{};
+	ibd.Usage = D3D11_USAGE_DEFAULT;
+	ibd.ByteWidth = (UINT)(sizeof(uint32_t) * idx.size());
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	D3D11_SUBRESOURCE_DATA isd{};
+	isd.pSysMem = idx.data();
+	ID3D11Buffer* ib = nullptr;
+	hr = Renderer::GetDevice()->CreateBuffer(&ibd, &isd, &ib);
+	if (FAILED(hr)) { vb->Release(); assert(false && "IB failed"); return; }
+
+	// ----- MeshFilter へ -----
+	filter->SetVertexBuffer(vb, sizeof(VERTEX_3D), (UINT)vertexes.size(), 0, true);
+	filter->SetIndexBuffer(ib, (UINT)idx.size(), DXGI_FORMAT_R32_UINT, true);
+	filter->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 }

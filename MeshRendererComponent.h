@@ -20,7 +20,10 @@ protected:
 	MeshFilterComponent* m_pMeshFilter = nullptr;
 	MaterialComponent*	 m_pMaterial = nullptr;
 
+	bool m_IsDraw = true;
 public:
+	void SetDraw(bool b) { m_IsDraw = b; }
+
 	void OnAdded() override
 	{
 		m_pTransform  = Owner()->GetComponent<TransformComponent>();
@@ -30,6 +33,7 @@ public:
 
 	void Draw() override
 	{
+		if (!m_IsDraw) return;
 		if (!m_pTransform || !m_pMeshFilter || !m_pMaterial) return;
 		if (!m_pMaterial->IsReady() || !m_pMeshFilter->IsReady()) return;
 
