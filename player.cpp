@@ -58,7 +58,7 @@ void Player::Init()
 
 
 	// î†ÇÃå`èÛÇÃê›íË -----
-	Vector3 size = { 10, 10, 10 };
+	Vector3 size = { 3, 2, 5 };
 	float thick = 1.0f;
 
 	m_pCubes[0] = Manager::GetScene()->AddGameObject<CubeObject>(1);
@@ -88,7 +88,7 @@ void Player::Init()
 	m_pCubes[4]->GetComponent<MeshRendererComponent>()->SetDraw(false);
 
 	// ç≈å„Ç…èÍèäÇéwíË
-	Vector3 worldPosition{ 0, -10, -15 };
+	Vector3 worldPosition{ 0, 0, 0 };
 	tf->SetPosition(worldPosition);
 	for (int i = 0; i < 5; i++)
 		m_pCubes[i]->Transform()->SetPosition(m_pCubes[i]->Transform()->Position() + worldPosition);
@@ -97,13 +97,20 @@ void Player::Init()
 
 }
 
+void Player::Uninit()
+{
+	GameObject::Uninit();
+	for (int i = 0; i < 5; i++)
+		m_pCubes[i]->RequestDestroy();
+}
+
 
 void Player::Update(float dt)
 {
 	GameObject::Update(dt);
 
 	// à⁄ìÆèàóù -----
-	float value = 0.1f;
+	float value = 0.05f;
 	Vector3 vect{};
 
 	if (Keyboard_IsKeyDown(KK_SPACE))

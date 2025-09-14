@@ -1,13 +1,13 @@
 /*
-	AppleObject.h
+	SlopObject.h
 	20250913 hanaue sho
 	リンゴのオブジェクト
 */
-#ifndef APPLEOBJECT_H_
-#define APPLEOBJECT_H_
+#ifndef SLOPOBJECT_H_
+#define SLOPOBJECT_H_
 #include "GameObject.h"
 
-class AppleObject : public GameObject
+class SlopObject : public GameObject
 {
 private:
 public:

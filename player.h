@@ -26,5 +26,6 @@ private:
 
 public:
 	void Init() override;
+	void Uninit() override;
 	void Update(float dt) override;
 };

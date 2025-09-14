@@ -1,9 +1,9 @@
 /*
-	AppleObject.cpp
+	SlopObject.cpp
 	20250913 hanaue sho
 	リンゴのオブジェクト
 */
-#include "AppleObject.h"
+#include "SlopObject.h"
 #include "TransformComponent.h"
 #include "MeshFilterComponent.h"
 #include "MeshFactory.h"
@@ -16,17 +16,17 @@
 
 
 
-void AppleObject::Init()
+void SlopObject::Init()
 {
 	// 1) Transform（既に GameObject ctor で追加済み）を取得して初期姿勢を入れておく
 	auto* tf = GetComponent<TransformComponent>();
-	tf->SetPosition({ 0,0,0 });
-	tf->SetScale({ 1.0f, 1.0f, 1.0f });
-	tf->SetEulerAngles({ 0,0,0 });
+	tf->SetPosition({ 0, 9.5f, 14 });
+	tf->SetScale({ 20.0f, 25.0f, 1.0f });
+	tf->SetEulerAngles({ 1.2f, 0, 0 });
 
 	// 2) MeshFilter を追加して頂点バッファ（4頂点の矩形）を作る
 	auto* mf = AddComponent<MeshFilterComponent>();
-	MeshFactory::CreateApple(mf, { 1, 24, 24 });
+	MeshFactory::CreateCube(mf, { {1, 1, 1} });
 
 	// 3) Material を追加（シェーダ/テクスチャ/マテリアル）
 	auto* mat = AddComponent<MaterialComponent>();
@@ -38,12 +38,12 @@ void AppleObject::Init()
 	Renderer::CreatePixelShader(&ps, "shader\\pixelLightingPS.cso");
 	mat->SetVSPS(vs, ps, il, /*takeVS*/true, /*takePS*/true, /*takeIL*/true);
 
-	ID3D11ShaderResourceView* srv = Texture::Load("assets\\texture\\appleTexture.png");
+	ID3D11ShaderResourceView* srv = Texture::Load("assets\\texture\\kirby.png");
 	// サンプラーは Renderer::Init() で 0番に PSSetSamplers 済みなら null でも描ける
 	mat->SetMainTexture(srv, /*sampler*/nullptr, /*takeSrv*/false, /*takeSamp*/false);
 
 	MATERIAL m{};
-	m.Diffuse = XMFLOAT4(1, 1, 1, 1);
+	m.Diffuse = XMFLOAT4(0.5f, 0.5f, 1, 1);
 	m.Ambient = XMFLOAT4(1, 1, 1, 1);
 	m.TextureEnable = TRUE;
 	mat->SetMaterial(m);
@@ -57,20 +57,17 @@ void AppleObject::Init()
 
 	// 物理を働かせたいのでコライダーなどを設定
 	Collider* coll = AddComponent<Collider>();
-	coll->SetSphere(1);
+	coll->SetBox({0.5f, 0.5f, 0.5f});
 	coll->SetTrigger(false);
 
 	Rigidbody* rigid = AddComponent<Rigidbody>();
-	rigid->SetGravityScale(1.0f);
-	rigid->SetMass(0.4f);
-	rigid->SetFrictionDynamic(0.15f);
-	rigid->SetFrictionStatic(0.4f);
-	rigid->ComputeSphereInertia(tf->Scale().x, rigid->Mass());
+	rigid->SetBodyType(Rigidbody::BodyType::Static);
+	rigid->SetFrictionStatic(0.44f);
+	rigid->SetFrictionDynamic(0.33f);
 }
 
-void AppleObject::Update(float dt)
+void SlopObject::Update(float dt)
 {
 	GameObject::Update(dt);
-
 
 }

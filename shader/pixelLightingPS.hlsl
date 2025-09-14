@@ -30,7 +30,7 @@ void main(in PS_IN In, out float4 outDiffuse : SV_Target)
     // 反射ベクトルと視線ベクトルの成す角を考える
     float specular = -dot(eyev, refv); // 鏡面反射の計算
     specular = saturate(specular); // 値をサチュレート
-    specular = pow(specular, 30); // 鏡面反射の値を飽和計算する
+    specular = pow(specular, 10); // 鏡面反射の値を飽和計算する
     
     // ランバート反射の結果へ加算する
     outDiffuse.rgb += specular; // スペキュラ値をデフューズとして足しこむ

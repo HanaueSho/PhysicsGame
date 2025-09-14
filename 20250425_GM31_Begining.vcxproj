@@ -144,10 +144,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppleObject.cpp" />
+    <ClCompile Include="AppleSpawnerObject.cpp" />
     <ClCompile Include="audio.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CameraMove.cpp" />
+    <ClCompile Include="CannonObject.cpp" />
     <ClCompile Include="Collision.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -177,6 +179,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="score.cpp" />
+    <ClCompile Include="SlopObject.cpp" />
     <ClCompile Include="SpherePolygon.cpp" />
     <ClCompile Include="SpherePolygonReverse.cpp" />
     <ClCompile Include="texture.cpp">
@@ -186,10 +189,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="title.cpp" />
+    <ClCompile Include="TowerObject.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppleObject.h" />
+    <ClInclude Include="AppleSpawnerObject.h" />
     <ClInclude Include="audio.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="bullet.h" />
@@ -197,6 +202,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="CameraMove.h" />
+    <ClInclude Include="CannonObject.h" />
     <ClInclude Include="ColliderComponent.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="component.h" />
@@ -232,11 +238,13 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="RigidbodyComponent.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="score.h" />
+    <ClInclude Include="SlopObject.h" />
     <ClInclude Include="SpherePolygon.h" />
     <ClInclude Include="SpherePolygonReverse.h" />
     <ClInclude Include="texture.h">
@@ -246,6 +254,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="title.h" />
+    <ClInclude Include="TowerObject.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="Vector3.h" />

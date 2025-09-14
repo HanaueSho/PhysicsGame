@@ -70,6 +70,7 @@ public:
 	// ゲッター
 	BodyType GetBodyType() const { return m_BodyType; }	// BodyType
 	bool  IsDynamic()	const { return m_BodyType == BodyType::Dynamic; }
+	float Mass()		const { return m_Mass; }
 	float InvMass()		const { return m_InvMass; }
 	float Restitution() const { return m_Restitution; }
 
@@ -109,7 +110,14 @@ public:
 		m_InertiaLocalInv.m[1][1] = 1.0f / Iy;
 		m_InertiaLocalInv.m[2][2] = 1.0f / Iz;
 	}
-
+	void ComputeSphereInertia(float radius, float mass)
+	{
+		const float invI = 5.0f / (2.0f * mass * radius * radius);
+		m_InertiaLocalInv.identity();
+		m_InertiaLocalInv.m[0][0] = invI;
+		m_InertiaLocalInv.m[1][1] = invI;
+		m_InertiaLocalInv.m[2][2] = invI;
+	}
 
 	// CenterOfMass をワールドへ変換
 	Vector3 WorldCOM() const

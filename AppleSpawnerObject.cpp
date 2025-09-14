@@ -1,9 +1,9 @@
 /*
-	AppleObject.cpp
+	AppleSpawnerObject.cpp
 	20250913 hanaue sho
 	リンゴのオブジェクト
 */
-#include "AppleObject.h"
+#include "AppleSpawnerObject.h"
 #include "TransformComponent.h"
 #include "MeshFilterComponent.h"
 #include "MeshFactory.h"
@@ -14,13 +14,16 @@
 #include "renderer.h"
 #include "texture.h"  // Texture::Load 既存
 
+#include "Manager.h"
+#include "Scene.h"
+#include "AppleObject.h"
 
 
-void AppleObject::Init()
+void AppleSpawnerObject::Init()
 {
 	// 1) Transform（既に GameObject ctor で追加済み）を取得して初期姿勢を入れておく
 	auto* tf = GetComponent<TransformComponent>();
-	tf->SetPosition({ 0,0,0 });
+	tf->SetPosition({ 0, 20, 21 });
 	tf->SetScale({ 1.0f, 1.0f, 1.0f });
 	tf->SetEulerAngles({ 0,0,0 });
 
@@ -38,7 +41,7 @@ void AppleObject::Init()
 	Renderer::CreatePixelShader(&ps, "shader\\pixelLightingPS.cso");
 	mat->SetVSPS(vs, ps, il, /*takeVS*/true, /*takePS*/true, /*takeIL*/true);
 
-	ID3D11ShaderResourceView* srv = Texture::Load("assets\\texture\\appleTexture.png");
+	ID3D11ShaderResourceView* srv = Texture::Load("assets\\texture\\kirby.png");
 	// サンプラーは Renderer::Init() で 0番に PSSetSamplers 済みなら null でも描ける
 	mat->SetMainTexture(srv, /*sampler*/nullptr, /*takeSrv*/false, /*takeSamp*/false);
 
@@ -55,22 +58,29 @@ void AppleObject::Init()
 	AddComponent<MeshRendererComponent>();
 
 
-	// 物理を働かせたいのでコライダーなどを設定
-	Collider* coll = AddComponent<Collider>();
-	coll->SetSphere(1);
-	coll->SetTrigger(false);
-
-	Rigidbody* rigid = AddComponent<Rigidbody>();
-	rigid->SetGravityScale(1.0f);
-	rigid->SetMass(0.4f);
-	rigid->SetFrictionDynamic(0.15f);
-	rigid->SetFrictionStatic(0.4f);
-	rigid->ComputeSphereInertia(tf->Scale().x, rigid->Mass());
 }
 
-void AppleObject::Update(float dt)
+void AppleSpawnerObject::Update(float dt)
 {
 	GameObject::Update(dt);
 
+	if (m_AppleCount > 50) return;
+	m_Timer += dt;
+	if (m_Timer > m_Interval)
+	{
+		float scale = 0.4f;
+		AppleObject* apple = Manager::GetScene()->AddGameObject<AppleObject>(1);
+		apple->Init();
+		apple->Transform()->SetScale({ scale, scale, scale });
+		apple->Transform()->SetPosition(Transform()->Position());
+		apple->GetComponent<Rigidbody>()->AddTorque({ 200, 0, 0 });
+		apple->GetComponent<Rigidbody>()->SetAngDamping(0.1f);
+		apple->GetComponent<Rigidbody>()->SetLinDamping(0.05f);
+		apple->GetComponent<Rigidbody>()->SetFrictionDynamic(0.15f);
+		apple->GetComponent<Rigidbody>()->SetFrictionStatic(0.2f);
+		m_Timer = 0.0f;
+
+		m_AppleCount ++;
+	}
 
 }
