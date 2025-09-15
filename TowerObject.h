@@ -21,6 +21,9 @@ public:
 	void CreateTower(int index, const Vector3& offset);
 	void CreateBridge();
 
+	// クリア判定チェック
+	bool CheckBlocks();
+
 };
 
 #endif

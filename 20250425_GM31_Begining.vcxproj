@@ -154,11 +154,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="CubeObject.cpp" />
+    <ClCompile Include="CylinderObject.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="Explosion.cpp" />
+    <ClCompile Include="FadeObject.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GroundObject.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="main.cpp" />
@@ -173,13 +176,16 @@
     <ClCompile Include="PhysicsWorld.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="PlaneObject.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="score.cpp" />
+    <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="SlopObject.cpp" />
+    <ClCompile Include="SphereObject.cpp" />
     <ClCompile Include="SpherePolygon.cpp" />
     <ClCompile Include="SpherePolygonReverse.cpp" />
     <ClCompile Include="texture.cpp">
@@ -190,13 +196,17 @@
     </ClCompile>
     <ClCompile Include="title.cpp" />
     <ClCompile Include="TowerObject.cpp" />
+    <ClCompile Include="TreeObject.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppleComponent.h" />
     <ClInclude Include="AppleObject.h" />
     <ClInclude Include="AppleSpawnerObject.h" />
     <ClInclude Include="audio.h" />
     <ClInclude Include="Bezier.h" />
+    <ClInclude Include="BillboardComponent.h" />
+    <ClInclude Include="BlockComponent.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="CALCULATION_HELPER.h" />
     <ClInclude Include="camera.h" />
@@ -208,12 +218,16 @@
     <ClInclude Include="component.h" />
     <ClInclude Include="ContactManifold.h" />
     <ClInclude Include="CubeObject.h" />
+    <ClInclude Include="CylinderObject.h" />
     <ClInclude Include="DebugRotateComponent.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="Explosion.h" />
+    <ClInclude Include="FadeObject.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GroundComponent.h" />
+    <ClInclude Include="GroundObject.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="main.h" />
@@ -235,6 +249,7 @@
     <ClInclude Include="PhysicsWorld.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="QuadObject.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="Quaternion.h" />
@@ -244,7 +259,10 @@
     <ClInclude Include="RigidbodyComponent.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="score.h" />
+    <ClInclude Include="SkydomeObject.h" />
+    <ClInclude Include="SlopComponent.h" />
     <ClInclude Include="SlopObject.h" />
+    <ClInclude Include="SphereObject.h" />
     <ClInclude Include="SpherePolygon.h" />
     <ClInclude Include="SpherePolygonReverse.h" />
     <ClInclude Include="texture.h">
@@ -257,6 +275,7 @@
     <ClInclude Include="TowerObject.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformComponent.h" />
+    <ClInclude Include="TreeObject.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="XMFLOAT_HELPER.h" />
   </ItemGroup>

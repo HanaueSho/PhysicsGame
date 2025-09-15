@@ -156,6 +156,18 @@ public:
 		return M;
 	}
 
+	// Right, Up, Forward Ç©ÇÁê∂ê¨
+	static Matrix4x4 CreateAxes(const Vector3& right, const Vector3& up, const Vector3& forward, const Vector3& trans = {0, 0, 0})
+	{
+		Matrix4x4 M{};
+
+		M.m[0][0] = right.x;	M.m[0][1] = right.y;	M.m[0][2] = right.z;	M.m[0][3] = 0.0f;
+		M.m[1][0] = up.x;		M.m[1][1] = up.y;		M.m[1][2] = up.z;		M.m[1][3] = 0.0f;
+		M.m[2][0] = forward.x;	M.m[2][1] = forward.y;	M.m[2][2] = forward.z;	M.m[2][3] = 0.0f;
+		M.m[3][0] = trans.x;	M.m[3][1] = trans.y;	M.m[3][2] = trans.z;	M.m[3][3] = 1.0f;
+		return M;
+	}
+
 	// ì]íuèàóù
 	Matrix4x4 Transpose() const 
 	{

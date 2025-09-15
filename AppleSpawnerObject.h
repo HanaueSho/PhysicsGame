@@ -10,9 +10,15 @@
 class AppleSpawnerObject : public GameObject
 {
 private:
+	// 
 	int m_AppleCount;
-	float m_Timer = 4.0f;
-	float m_Interval = 0.5f;
+	float m_Timer = 0.0f;
+	float m_Interval = 1.0f;
+	float m_TimerSum = 0.0f;
+
+	// ˆÚ“®ˆ—
+	float m_Sign = 1;
+
 public:
 	void Init() override;
 	void Update(float dt) override;

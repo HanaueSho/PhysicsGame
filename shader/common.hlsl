@@ -47,7 +47,6 @@ struct PS_IN
     float4 Normal : NORMAL0;
     float4 Diffuse : COLOR0;
     float2 TexCoord : TEXCOORD0;
-    MATERIAL Material : MATERIAL;
 };
 
 struct LIGHT
@@ -61,6 +60,11 @@ struct LIGHT
     float4 Position; // 光の位置
     float4 PointLightParam; // 光の届く距離
 };
+
+cbuffer MaterialBuffer : register(b3)
+{
+    MATERIAL Material;
+}
 
 cbuffer LightBuffer : register(b4) // コンスタントバッファ４番とする
 {

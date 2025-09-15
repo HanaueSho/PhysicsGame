@@ -17,6 +17,7 @@
 #include "Manager.h"
 #include "Scene.h"
 #include "CubeObject.h"
+#include "BlockComponent.h"
 
 void TowerObject::Init()
 {
@@ -24,7 +25,7 @@ void TowerObject::Init()
 	auto* tf = GetComponent<TransformComponent>();
 	tf->SetPosition({ 0, 0, 0 });
 	tf->SetScale({ 1.0f, 1.0f, 1.0f });
-	tf->SetEulerAngles({ 0,0,0 });
+	tf->SetEulerAngles({ 0, 0, 0 });
 
 	// 2) MeshFilter を追加して頂点バッファ（4頂点の矩形）を作る
 	auto* mf = AddComponent<MeshFilterComponent>();
@@ -54,14 +55,7 @@ void TowerObject::Init()
 	mat->SetBlendMode(/*Alpha*/MaterialComponent::BlendMode::Opaque);
 
 	// 4) MeshRenderer を追加（描画実行係）
-	AddComponent<MeshRendererComponent>();
-
-	// タワー生成 -----
-	CreateTable({ 10, 0, 0 });
-	
-	CreateTower(0, { 1, 0, 0 });
-	CreateTower(3, { -1, 0, 0 });
-
+	//AddComponent<MeshRendererComponent>();
 }
 
 void TowerObject::Update(float dt)
@@ -72,7 +66,7 @@ void TowerObject::Update(float dt)
 
 void TowerObject::CreateTable(const Vector3& worldPosition)
 {
-	Vector3 sizeTable = { 7, 0.5f, 3 };
+	Vector3 sizeTable = { 7, 0.5f, 2.5f };
 	// テーブル生成
 	m_pTable = Manager::GetScene()->AddGameObject<CubeObject>(1);
 	m_pTable->Init();
@@ -80,6 +74,8 @@ void TowerObject::CreateTable(const Vector3& worldPosition)
 	m_pTable->Transform()->SetPosition(worldPosition);
 	m_pTable->GetComponent<Rigidbody>()->SetBodyType(Rigidbody::BodyType::Static);
 
+	ID3D11ShaderResourceView* srv = Texture::Load("assets\\texture\\cannon.png");
+	m_pTable->GetComponent<MaterialComponent>()->SetMainTexture(srv, /*sampler*/nullptr, /*takeSrv*/false, /*takeSamp*/false);
 }
 
 void TowerObject::CreateTower(int index, const Vector3& offset)
@@ -91,11 +87,12 @@ void TowerObject::CreateTower(int index, const Vector3& offset)
 	// タワー部分
 	for (int i = index; i < index + 3; i++)
 	{
-		float weight = (float)pow(0.8f, num);
+		float weight = (float)pow(0.75f, num);
 		m_pBlocks[i] = Manager::GetScene()->AddGameObject<CubeObject>(1);
 		m_pBlocks[i]->Init();
 		m_pBlocks[i]->Transform()->SetScale({ sizeBlock.x * weight, sizeBlock.y * weight, sizeBlock.z * weight });
-		m_pBlocks[i]->Transform()->SetPosition({ 0, 0 + size.y * 0.5f + sizeBlock.y  * (num + 0.5f), 0 });
+		m_pBlocks[i]->Transform()->SetPosition({ 0, 0.0f + size.y * 0.5f + sizeBlock.y  * (num + 0.5f), 0 });
+		m_pBlocks[i]->AddComponent<BlockComponent>();
 		Rigidbody* rigid = m_pBlocks[i]->GetComponent<Rigidbody>();
 		rigid->SetBodyType(Rigidbody::BodyType::Dynamic);
 		rigid->SetGravityScale(1.0f);
@@ -105,16 +102,37 @@ void TowerObject::CreateTower(int index, const Vector3& offset)
 		num++;
 	}
 
-
 	// 最後に場所を指定
 	Vector3 worldPosition = m_pTable->Transform()->Position() + offset;
 	for (int i = index; i < index + 3; i++)
 		m_pBlocks[i]->Transform()->SetPosition(m_pBlocks[i]->Transform()->Position() + worldPosition);
 
+	// テクスチャ反映
+	auto* srv = Texture::Load("assets\\texture\\block.png");
+	for (int i = index; i < index + 3; i++)
+	{
+		auto* mat = m_pBlocks[i]->GetComponent<MaterialComponent>();
+		mat->SetMainTexture(srv, /*sampler*/nullptr, /*takeSrv*/false, /*takeSamp*/false);
+	}
 
 }
 
 void TowerObject::CreateBridge()
 {
+}
+
+bool TowerObject::CheckBlocks()
+{
+	bool b = true;
+
+	for (int i = 0; i < 9; i++)
+	{
+		if (!m_pBlocks[i]) continue;
+
+		if (!m_pBlocks[i]->GetComponent<BlockComponent>()->IsCounted()) // 一つでもまだ false
+			return false;
+	}
+
+	return b;
 }
 

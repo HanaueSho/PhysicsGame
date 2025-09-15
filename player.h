@@ -24,8 +24,21 @@ private:
 	GameObject* m_pCubes[5];
 	class Audio* m_pSE;
 
+	Vector3 m_Acceleration{};
+	Vector3 m_Velocity{};
+	const float MAX_VELOCITY = 0.1f;
+	const float MAX_ACCE	 = 0.05f;
+	bool m_IsMove = true;
+
+	bool m_IsMoveTarget = false;
+	Vector3 m_TargetPosition = { 0, 0, -8 };
+
 public:
 	void Init() override;
 	void Uninit() override;
 	void Update(float dt) override;
+
+	void SetMove(bool b) { m_IsMove = b; }
+	void MoveTarget(float dt);
+
 };

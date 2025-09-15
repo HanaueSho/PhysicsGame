@@ -135,10 +135,10 @@ void Scene::Draw()
 	// ----- ソート -----
 	// 不透明： front-to-back（小さいdepth＝手前から）
 	std::stable_sort(opaques.begin(), opaques.end(),
-		[](const DrawItem& a, const DrawItem& b) {return a.depth < b.depth; });
+		[](const DrawItem& a, const DrawItem& b) {return a.depth > b.depth; });
 	// 透明：　back-to-front（大きいdepth＝奥から）
 	std::stable_sort(transparents.begin(), transparents.end(),
-		[](const DrawItem& a, const DrawItem& b) {return a.depth > b.depth; });
+		[](const DrawItem& a, const DrawItem& b) {return a.depth < b.depth; });
 
 	// ----- 描画 -----
 	// 不透明（depth書き込みON, ブレンドOFF）

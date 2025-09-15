@@ -5,20 +5,21 @@
 #include "enemy.h"
 #include "Collision.h"
 #include "Keyboard.h"
+#include "BillboardComponent.h"
 
 
 void Enemy::Init()
 {
 	// 1) Transform（既に GameObject ctor で追加済み）を取得して初期姿勢を入れておく
 	auto* tf = GetComponent<TransformComponent>();
-	tf->SetPosition({ 0,0,0 });
+	tf->SetPosition({ 0,5,0 });
 	tf->SetScale({ 1,1,1 });
 	tf->SetEulerAngles({ 0,0,0 });
 
 	// 2) MeshFilter を追加して頂点バッファ（4頂点の矩形）を作る
 	auto* mf = AddComponent<MeshFilterComponent>();
-	MeshFactory::CreateCube(mf, { {2.0f, 2.0f, 2.0f}});
-	//MeshFactory::CreateSphere(mf, { 1, 12, 12});
+	//MeshFactory::CreateCube(mf, { {2.0f, 2.0f, 2.0f}});
+	MeshFactory::CreateSphere(mf, { 1, 12, 12});
 	//MeshFactory::CreateCylinder(mf, { 2, 20, 12 });
 	//MeshFactory::CreateCapsule(mf, { 1, 12, 12});
 
@@ -57,9 +58,11 @@ void Enemy::Init()
 	// Rigidbody
 	Rigidbody* rigid = AddComponent<Rigidbody>();
 	rigid->ComputeBoxInertia({ 1, 1, 1 }, 1);
-	//rigid->SetBodyType(Rigidbody::BodyType::Kinematic);
+	rigid->SetBodyType(Rigidbody::BodyType::Kinematic);
 	rigid->AddForce({ 0, 500, 0 });
 	rigid->SetMass(1);
+
+	AddComponent<BillboardComponent>();
 }
 
 void Enemy::Update(float dt)

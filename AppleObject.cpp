@@ -11,9 +11,9 @@
 #include "MeshRendererComponent.h"
 #include "RigidbodyComponent.h"
 #include "ColliderComponent.h"
+#include "AppleComponent.h"
 #include "renderer.h"
 #include "texture.h"  // Texture::Load Šù‘¶
-
 
 
 void AppleObject::Init()
@@ -66,11 +66,15 @@ void AppleObject::Init()
 	rigid->SetFrictionDynamic(0.15f);
 	rigid->SetFrictionStatic(0.4f);
 	rigid->ComputeSphereInertia(tf->Scale().x, rigid->Mass());
+
+	auto* ac = AddComponent<AppleComponent>();
+	ac->Init();
 }
 
 void AppleObject::Update(float dt)
 {
 	GameObject::Update(dt);
 
-
+	if (Transform()->Position().y < -3)
+		RequestDestroy();
 }

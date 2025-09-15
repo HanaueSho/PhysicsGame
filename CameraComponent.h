@@ -57,6 +57,7 @@ public:
 	void SetFovY(float fovY)				 noexcept { m_FovY = fovY; m_ProjDirty = true; }
 	void SetAspect(float aspect)			 noexcept { m_Aspect = aspect; m_ProjDirty = true; }
 	void SetNearFar(float nearZ, float farZ) noexcept { m_NearZ = nearZ; m_FarZ = farZ; m_ProjDirty = true; }
+	float FovY() const { return m_FovY; }
 
 	// ----- ïΩçsìäâe -----
 	void SetOrthoOffCenter(float left, float right, float bottom, float top, float nearZ = 0.0f, float farZ = 1.0f) noexcept

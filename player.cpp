@@ -53,7 +53,7 @@ void Player::Init()
 	mat->SetBlendMode(/*Alpha*/MaterialComponent::BlendMode::Opaque);
 
 	// 4) MeshRenderer を追加（描画実行係）
-	AddComponent<MeshRendererComponent>();
+	//AddComponent<MeshRendererComponent>();
 
 
 
@@ -93,8 +93,13 @@ void Player::Init()
 	for (int i = 0; i < 5; i++)
 		m_pCubes[i]->Transform()->SetPosition(m_pCubes[i]->Transform()->Position() + worldPosition);
 
-
-
+	// テクスチャ反映
+	srv = Texture::Load("assets\\texture\\basket.png");
+	for (int i = 0; i < 5; i++)
+	{
+		auto* mat = m_pCubes[i]->GetComponent<MaterialComponent>();
+		mat->SetMainTexture(srv, /*sampler*/nullptr, /*takeSrv*/false, /*takeSamp*/false);
+	}
 }
 
 void Player::Uninit()
@@ -110,39 +115,61 @@ void Player::Update(float dt)
 	GameObject::Update(dt);
 
 	// 移動処理 -----
-	float value = 0.05f;
-	Vector3 vect{};
+	if (!m_IsMove) return;
+	float value = 0.03f * dt;
 
-	if (Keyboard_IsKeyDown(KK_SPACE))
-	{
-		vect.y += value;
-	}
-	if (Keyboard_IsKeyDown(KK_LEFTSHIFT))
-	{
-		vect.y -= value;
-	}
 	if (Keyboard_IsKeyDown(KK_LEFT))
 	{
-		vect.x -= value;
+		if (m_Acceleration.x > 0) m_Acceleration.x = 0;
+		m_Acceleration.x -= value;
 	}
-	if (Keyboard_IsKeyDown(KK_RIGHT))
+	else if (Keyboard_IsKeyDown(KK_RIGHT))
 	{
-		vect.x += value;
+		if (m_Acceleration.x < 0) m_Acceleration.x = 0;
+		m_Acceleration.x += value;
 	}
-	if (Keyboard_IsKeyDown(KK_UP))
+	else
 	{
-		vect.z += value;
+		m_Acceleration.x = 0;
 	}
-	if (Keyboard_IsKeyDown(KK_DOWN))
-	{
-		vect.z -= value;
-	}
+
+	m_Velocity.x *= 0.9f; // 減衰
+	m_Velocity += m_Acceleration;
+	if (m_Acceleration.x >  MAX_ACCE) m_Acceleration.x =  MAX_ACCE;
+	if (m_Acceleration.x < -MAX_ACCE) m_Acceleration.x = -MAX_ACCE;
+	if (m_Velocity.x >  MAX_VELOCITY) m_Velocity.x =  MAX_VELOCITY;
+	if (m_Velocity.x < -MAX_VELOCITY) m_Velocity.x = -MAX_VELOCITY;
 
 	// 自分を動かす
-	Transform()->SetPosition(Transform()->Position() + vect);
+	Transform()->SetPosition(Transform()->Position() + m_Velocity);
+	if (Transform()->Position().x > 10)
+	{
+		Transform()->SetPosition({ 10, Transform()->Position().y, Transform()->Position().z });
+		m_Velocity.x = 0;
+		m_Acceleration.x = 0;
+	}
+	else if (Transform()->Position().x < -10)
+	{
+		Transform()->SetPosition({ -10, Transform()->Position().y, Transform()->Position().z });
+		m_Velocity.x = 0;
+		m_Acceleration.x = 0;
+	}
+	else
+	{
+		// 箱も動かす
+		for (int i = 0; i < 5; i++)
+			m_pCubes[i]->Transform()->SetPosition(m_pCubes[i]->Transform()->Position() + m_Velocity);
+	}
+}
 
-	// 箱も動かす
+void Player::MoveTarget(float dt)
+{
+	Vector3 pos = Transform()->Position();
+	Vector3 diff = m_TargetPosition - pos;
+	diff *= dt * 0.2f;
+	pos += diff;
+	Transform()->SetPosition(pos);
+
 	for (int i = 0; i < 5; i++)
-		m_pCubes[i]->Transform()->SetPosition(m_pCubes[i]->Transform()->Position() + vect);
-
+		m_pCubes[i]->Transform()->SetPosition(m_pCubes[i]->Transform()->Position() + diff);
 }

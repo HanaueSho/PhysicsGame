@@ -17,6 +17,7 @@
 #include "Manager.h"
 #include "Scene.h"
 #include "AppleObject.h"
+#include "Random.h"
 
 
 void AppleSpawnerObject::Init()
@@ -64,23 +65,48 @@ void AppleSpawnerObject::Update(float dt)
 {
 	GameObject::Update(dt);
 
-	if (m_AppleCount > 50) return;
+	if (m_TimerSum > 55) return;
+	// ¶¬ˆ— -----
 	m_Timer += dt;
+	m_TimerSum += dt;
 	if (m_Timer > m_Interval)
 	{
-		float scale = 0.4f;
+		float rand = Random::RandomRange(0.8f, 1.0f);
+		float scale = 0.4f * rand;
 		AppleObject* apple = Manager::GetScene()->AddGameObject<AppleObject>(1);
 		apple->Init();
 		apple->Transform()->SetScale({ scale, scale, scale });
 		apple->Transform()->SetPosition(Transform()->Position());
-		apple->GetComponent<Rigidbody>()->AddTorque({ 200, 0, 0 });
-		apple->GetComponent<Rigidbody>()->SetAngDamping(0.1f);
-		apple->GetComponent<Rigidbody>()->SetLinDamping(0.05f);
-		apple->GetComponent<Rigidbody>()->SetFrictionDynamic(0.15f);
-		apple->GetComponent<Rigidbody>()->SetFrictionStatic(0.2f);
+		Rigidbody* rigid = apple->GetComponent<Rigidbody>();
+		rigid->AddTorque({ 200, 0, 0 });
+		rigid->SetAngDamping(0.1f);
+		rigid->SetLinDamping(0.05f);
+		rigid->SetFrictionDynamic(0.15f);
+		rigid->SetFrictionStatic(0.2f);
+		rigid->ComputeSphereInertia(apple->Transform()->Scale().x, rigid->Mass());
 		m_Timer = 0.0f;
 
-		m_AppleCount ++;
+		m_Interval = 1.0f - 0.6f * (60.0f - m_TimerSum) / 60.0f;
 	}
 
+	// ˆÚ“®ˆ— -----
+	float rand = Random::RandomRange(0, 6);
+	Vector3 pos = Transform()->Position();
+	pos.x += (5 + rand * rand) * dt * m_Sign;
+	Transform()->SetPosition(pos);
+
+	if (Transform()->Position().x > 9)
+	{
+		Vector3 pos = Transform()->Position();
+		pos.x = 9;
+		Transform()->SetPosition(pos);
+		m_Sign = -1;
+	}
+	if (Transform()->Position().x < -9)
+	{
+		Vector3 pos = Transform()->Position();
+		pos.x = -9;
+		Transform()->SetPosition(pos);
+		m_Sign = 1;
+	}
 }

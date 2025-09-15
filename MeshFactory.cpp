@@ -28,10 +28,10 @@ void MeshFactory::CreateQuad(MeshFilterComponent* filter, const QuadParams& p)
 	float y0 = p.originCenter ? -hh : 0.0f;
 
 	// ----- 頂点データ作成（左上基準） -----
-	v[0].Position = { x0		  , y0			 , 0.0f }; v[0].Normal = { 0, 0, 1 }; v[0].Diffuse = { 1, 1, 1, 1 }; v[0].TexCoord = { 0, 0 };
-	v[1].Position = { x0 + p.width, y0			 , 0.0f }; v[1].Normal = { 0, 0, 1 }; v[1].Diffuse = { 1, 1, 1, 1 }; v[1].TexCoord = { 1, 0 };
-	v[2].Position = { x0		  , y0 + p.height, 0.0f }; v[2].Normal = { 0, 0, 1 }; v[2].Diffuse = { 1, 1, 1, 1 }; v[2].TexCoord = { 0, 1 };
-	v[3].Position = { x0 + p.width, y0 + p.height, 0.0f }; v[3].Normal = { 0, 0, 1 }; v[3].Diffuse = { 1, 1, 1, 1 }; v[3].TexCoord = { 1, 1 };
+	v[0].Position = { x0		  , y0			 , 0.0f }; v[0].Normal = { 0, 0, 1 }; v[0].Diffuse = { 1, 1, 1, 1 }; v[0].TexCoord = { 1, 1 };
+	v[1].Position = { x0 + p.width, y0			 , 0.0f }; v[1].Normal = { 0, 0, 1 }; v[1].Diffuse = { 1, 1, 1, 1 }; v[1].TexCoord = { 0, 1 };
+	v[2].Position = { x0		  , y0 + p.height, 0.0f }; v[2].Normal = { 0, 0, 1 }; v[2].Diffuse = { 1, 1, 1, 1 }; v[2].TexCoord = { 1, 0 };
+	v[3].Position = { x0 + p.width, y0 + p.height, 0.0f }; v[3].Normal = { 0, 0, 1 }; v[3].Diffuse = { 1, 1, 1, 1 }; v[3].TexCoord = { 0, 0 };
 
 	// ----- VB 作成 -----
 	D3D11_BUFFER_DESC bd{};

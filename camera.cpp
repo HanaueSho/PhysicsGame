@@ -14,7 +14,7 @@ void Camera::Init()
 {
 	auto* tf = GetComponent<TransformComponent>();
 	auto* camera = AddComponent<CameraComponent>();
-	auto* cameraMove = AddComponent<CameraMove>();
+	//auto* cameraMove = AddComponent<CameraMove>();
 
 	// 2DÝ’è
 	camera->SetMode(CameraComponent::Mode::Ortho2D);
