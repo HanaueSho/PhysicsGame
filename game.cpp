@@ -109,6 +109,8 @@ void Game::Uninit()
 void Game::Update(float dt)
 {
 	Scene::Update(dt);	
+	if (Keyboard_IsKeyDown(KK_P)) // リセットボタン
+		SetGameMode(TO_TITLE);
 
 	// スイッチステート
 	switch (m_Mode)

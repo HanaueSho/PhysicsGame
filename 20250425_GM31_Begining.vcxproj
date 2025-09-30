@@ -259,6 +259,7 @@
     <ClInclude Include="RigidbodyComponent.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="score.h" />
+    <ClInclude Include="ShakeComponent.h" />
     <ClInclude Include="SkydomeObject.h" />
     <ClInclude Include="SlopComponent.h" />
     <ClInclude Include="SlopObject.h" />

@@ -5,6 +5,7 @@
 #include	"Camera.h"
 #include	"CameraMove.h"
 #include	"mouse.h"
+#include	"ShakeComponent.h"
 
 
 // --------------------------------------------------
@@ -15,6 +16,7 @@ void Camera::Init()
 	auto* tf = GetComponent<TransformComponent>();
 	auto* camera = AddComponent<CameraComponent>();
 	//auto* cameraMove = AddComponent<CameraMove>();
+	AddComponent<CameraShake>();
 
 	// 2DÝ’è
 	camera->SetMode(CameraComponent::Mode::Ortho2D);

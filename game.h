@@ -32,7 +32,7 @@ private:
 
 	// ŽžŠÔŒo‰ß
 	float m_Timer = 0.0f;
-	float m_TimeColl = 60.0f;
+	float m_TimeColl = 30.0f;
 	float m_TimeToShot = 2.5f;
 	float m_Interval = 3.0f;
 

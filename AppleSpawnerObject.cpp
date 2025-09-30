@@ -65,7 +65,7 @@ void AppleSpawnerObject::Update(float dt)
 {
 	GameObject::Update(dt);
 
-	if (m_TimerSum > 55) return;
+	if (m_TimerSum > 25) return;
 	// ¶¬ˆ— -----
 	m_Timer += dt;
 	m_TimerSum += dt;
@@ -86,7 +86,7 @@ void AppleSpawnerObject::Update(float dt)
 		rigid->ComputeSphereInertia(apple->Transform()->Scale().x, rigid->Mass());
 		m_Timer = 0.0f;
 
-		m_Interval = 1.0f - 0.6f * (60.0f - m_TimerSum) / 60.0f;
+		m_Interval = 1.0f - 0.6f * (30.0f - m_TimerSum) / 30.0f;
 	}
 
 	// ˆÚ“®ˆ— -----

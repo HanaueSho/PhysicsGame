@@ -20,6 +20,7 @@
 #include "AppleObject.h"
 #include "Camera.h"
 #include "Audio.h"
+#include "ShakeComponent.h"
 
 void CannonObject::Init()
 {
@@ -142,6 +143,8 @@ void CannonObject::Update(float dt)
 	if (Keyboard_IsKeyDownTrigger(KK_SPACE))
 	{
 		ShotApple();
+		Camera* pCamera = Manager::GetScene()->GetGameObject<Camera>();
+		pCamera->GetComponent<CameraShake>()->Shake({0, 1, 0});
 	}
 
 }

@@ -8,6 +8,8 @@
 #include "Keyboard.h"
 #include "CubeObject.h"
 #include "MeshRendererComponent.h"
+#include "Camera.h"
+#include "ShakeComponent.h"
 
 
 void Player::Init()
@@ -133,11 +135,11 @@ void Player::Update(float dt)
 		m_Acceleration.x = 0;
 	}
 
-	m_Velocity.x *= 0.9f; // Œ¸Š
+	m_Velocity.x *= 2.0f * dt; // Œ¸Š
 	m_Velocity += m_Acceleration;
-	if (m_Acceleration.x >  MAX_ACCE) m_Acceleration.x =  MAX_ACCE;
+	if (m_Acceleration.x > MAX_ACCE) m_Acceleration.x = MAX_ACCE;
 	if (m_Acceleration.x < -MAX_ACCE) m_Acceleration.x = -MAX_ACCE;
-	if (m_Velocity.x >  MAX_VELOCITY) m_Velocity.x =  MAX_VELOCITY;
+	if (m_Velocity.x > MAX_VELOCITY) m_Velocity.x = MAX_VELOCITY;
 	if (m_Velocity.x < -MAX_VELOCITY) m_Velocity.x = -MAX_VELOCITY;
 
 	// Ž©•ª‚ð“®‚©‚·
@@ -159,6 +161,12 @@ void Player::Update(float dt)
 		// ” ‚à“®‚©‚·
 		for (int i = 0; i < 5; i++)
 			m_pCubes[i]->Transform()->SetPosition(m_pCubes[i]->Transform()->Position() + m_Velocity);
+	}
+
+	if (Keyboard_IsKeyDownTrigger(KK_R))
+	{
+		Camera* pCamera = Manager::GetScene()->GetGameObject<Camera>();
+		pCamera->GetComponent<CameraShake>()->Shake({ 0, 1, 0 });
 	}
 }
 

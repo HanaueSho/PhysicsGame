@@ -195,11 +195,12 @@ void SlopObject::Update(float dt)
 			m_Sign[i] *= -1;
 	}
 
-	// 10, 11 ‚Ì‰ñ“]‘Ìˆ— -----
+	// 10, 11 ‚Ì‰ñ“]‘Ìˆ— ----
+	float weight = 70 * dt;
 	Rigidbody* rigid10 = m_pObstancle[10]->GetComponent<Rigidbody>();
-	rigid10->AddTorque({ 0, 150, 0 });
+	rigid10->AddTorque({ 0, 150 * weight, 0 });
 	Rigidbody* rigid11 = m_pObstancle[11]->GetComponent<Rigidbody>();
-	rigid11->AddTorque({ 0, -150, 0 });
+	rigid11->AddTorque({ 0, -150 * weight, 0 });
 
 
 }
