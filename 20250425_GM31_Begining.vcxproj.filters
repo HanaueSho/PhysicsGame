@@ -278,12 +278,6 @@
     <ClInclude Include="SpherePolygonReverse.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PaperPolygon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="MathCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

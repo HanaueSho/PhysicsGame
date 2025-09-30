@@ -241,14 +241,8 @@
     <ClInclude Include="MeshRendererComponent.h" />
     <ClInclude Include="modelRenderer.h" />
     <ClInclude Include="mouse.h" />
-    <ClInclude Include="PaperPolygon.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="PhysicsBody.h" />
     <ClInclude Include="PhysicsSystem.h" />
-    <ClInclude Include="PhysicsWorld.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="QuadObject.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="polygon.h" />

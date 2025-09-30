@@ -153,13 +153,13 @@ void PhysicsSystem::EndStep(float fixedDt)
 	auto diffSets = [&](auto& prev, auto& curr, auto& outEnter, auto& outExit)
 		{
 			// Enter : Curr にあって Prev にない
-			for (auto k: curr) 
+			for (auto k : curr)
 				if (!prev.count(k))
 				{
 					outEnter.emplace_back(m_ById[KeyHigh(k)], m_ById[KeyLow(k)]); // Enter にいれる
 				}
 			// Exit : Prev にあって Curr にない
-			for (auto k : prev) 
+			for (auto k : prev)
 				if (!curr.count(k))
 				{
 					outExit.emplace_back(m_ById[KeyHigh(k)], m_ById[KeyLow(k)]); // Exit にいれる
@@ -167,11 +167,11 @@ void PhysicsSystem::EndStep(float fixedDt)
 			prev.swap(curr); curr.clear();
 		};
 
-	diffSets(m_PrevTrigger  , m_CurrTrigger  , m_TriggerEnter  , m_TriggerExit);
+	diffSets(m_PrevTrigger, m_CurrTrigger, m_TriggerEnter, m_TriggerExit);
 	diffSets(m_PrevCollision, m_CurrCollision, m_CollisionEnter, m_CollisionExit);
 
 	// ----- ディスパッチ処理 -----
-	DispatchEvents(); 
+	DispatchEvents();
 }
 
 void PhysicsSystem::DispatchEvents()
@@ -259,7 +259,7 @@ void PhysicsSystem::IntegrationForce(float dt)
 			gravity = rb->CustomGravity();
 			break;
 		case Rigidbody::GravityMode::None: // 無重力
-			gravity = {0.0f, 0.0f, 0.0f};
+			gravity = { 0.0f, 0.0f, 0.0f };
 			break;
 		}
 
@@ -303,7 +303,7 @@ void PhysicsSystem::DetermineCollision()
 
 			const Transform& transB = B->Owner()->GetComponent<TransformComponent>()->Value();
 
-			ContactManifold m; 
+			ContactManifold m;
 			if (!shapeA->isOverlap(transA, *shapeB, transB, m, 0.0f)) continue;
 
 			if (A->IsTrigger() || B->IsTrigger()) m_CurrTrigger.insert(MakePairKey(A->Id(), B->Id()));
@@ -334,7 +334,7 @@ void PhysicsSystem::ResolveVelocity(float dt)
 
 		// 反発係数
 		const float eCandidate = std::max(rbA ? rbA->Restitution() : 0.0f,
-										  rbB ? rbB->Restitution() : 0.0f);
+			rbB ? rbB->Restitution() : 0.0f);
 
 		// 摩擦係数（現在はRigidbody）
 		const float fricDynamicA = rbA ? rbA->FrictionDynamic() : 0.0f;
@@ -354,10 +354,10 @@ void PhysicsSystem::ResolveVelocity(float dt)
 		auto AngTerm = [](Rigidbody* rb, const Vector3& r, const Vector3& d) -> float
 			{
 				// n・[(I^-1 (r×d))×r] = dot(d, (r×d))×r)を展開してもいいが可読性重視でこちら
-				return  Vector3::Dot(d, Vector3::CrossLH(rb->ApplyInvInertiaWorld(Vector3::CrossLH(r, d)), r));
+				return  Vector3::Dot(d, Vector3::Cross(rb->ApplyInvInertiaWorld(Vector3::Cross(r, d)), r));
 			};
 
-		
+
 		// ======== PHASE 1: 全接点の「法線」だけ解く =========
 		// 各接触点について法線インパルス
 		Vector3 sumTor = Vector3();
@@ -373,13 +373,13 @@ void PhysicsSystem::ResolveVelocity(float dt)
 			const Vector3 rB = p - xB; // COM からのベクトル（相対位置）
 
 			// 速度（角成分込み）
-			const Vector3 vA = rbA ? rbA->Velocity()		: Vector3{};
+			const Vector3 vA = rbA ? rbA->Velocity() : Vector3{};
 			const Vector3 wA = rbA ? rbA->AngularVelocity() : Vector3{};
-			const Vector3 vB = rbB ? rbB->Velocity()		: Vector3{};
+			const Vector3 vB = rbB ? rbB->Velocity() : Vector3{};
 			const Vector3 wB = rbB ? rbB->AngularVelocity() : Vector3{};
 
 			// 接触点の相対速度 vRel = (vB + wB×rB) - (vA + wA×rA) [relative velocity]
-			const Vector3 vRel = (vB + Vector3::CrossLH(wB, rB)) - (vA + Vector3::CrossLH(wA, rA)); // 相対速度（Aから見たBの相対速度）
+			const Vector3 vRel = (vB + Vector3::Cross(wB, rB)) - (vA + Vector3::Cross(wA, rA)); // 相対速度（Aから見たBの相対速度）
 			const float relVelN = Vector3::Dot(vRel, n); // 法線方向の相対速度 [normal relative velocity]
 			if (relVelN > 0.0f && c.m.points[i].penetration <= Slop) continue; // 離れていく方向 && めり込みが無い なので不要
 
@@ -411,19 +411,16 @@ void PhysicsSystem::ResolveVelocity(float dt)
 			if (rbA && invA > 0.0f)
 			{
 				rbA->SetVelocity(vA - impulseVector * invA);
-				rbA->SetAngularVelocity(wA - rbA->ApplyInvInertiaWorld(Vector3::CrossLH(rA, impulseVector)));
-				sumTor += -rbA->ApplyInvInertiaWorld(Vector3::CrossLH(rA, impulseVector));
+				rbA->SetAngularVelocity(wA - rbA->ApplyInvInertiaWorld(Vector3::Cross(rA, impulseVector)));
+				sumTor += -rbA->ApplyInvInertiaWorld(Vector3::Cross(rA, impulseVector));
 			}
 			if (rbB && invB > 0.0f)
 			{
 				rbB->SetVelocity(vB + impulseVector * invB);
-				rbB->SetAngularVelocity(wB + rbB->ApplyInvInertiaWorld(Vector3::CrossLH(rB, impulseVector)));
+				rbB->SetAngularVelocity(wB + rbB->ApplyInvInertiaWorld(Vector3::Cross(rB, impulseVector)));
 			}
-			float signPribe = (p.x - xA.x) * deltaImpulseN;
-			Vector3 dw = rbA->ApplyInvInertiaWorld(Vector3::CrossLH(p - xA, -n * deltaImpulseN));
-			int f = 0;
 		}
-		
+
 		// ======== PHASE 2: 全接点の「摩擦」だけ解く =========
 		// 各接触点について摩擦
 		for (int i = 0; i < c.m.count; i++)
@@ -442,14 +439,14 @@ void PhysicsSystem::ResolveVelocity(float dt)
 			const Vector3 wA2 = rbA ? rbA->AngularVelocity() : Vector3{};
 			const Vector3 vB2 = rbB ? rbB->Velocity() : Vector3{};
 			const Vector3 wB2 = rbB ? rbB->AngularVelocity() : Vector3{};
-			const Vector3 vRel2 = (vB2 + Vector3::CrossLH(wB2, rB)) - (vA2 + Vector3::CrossLH(wA2, rA)); // 相対速度
+			const Vector3 vRel2 = (vB2 + Vector3::Cross(wB2, rB)) - (vA2 + Vector3::Cross(wA2, rA)); // 相対速度
 
 			// ----- 希望する接線のインパルス -----
 			Vector3 t1;
 			if (fabsf(n.x) > 0.57735f) t1 = Vector3{ -n.y, n.x, 0.0f };
 			else					   t1 = Vector3{ 0.0f, -n.z, n.y };
 			t1 = t1.normalized();
-			Vector3 t2 = Vector3::CrossLH(n, t1); // 接線方向（２軸目）
+			Vector3 t2 = Vector3::Cross(n, t1); // 接線方向（２軸目）
 
 			// 有効質量の分母
 			float denomT1 = invA + invB; // 接線方向の有効質量の分母 [tangential impulse mass]
@@ -485,7 +482,7 @@ void PhysicsSystem::ResolveVelocity(float dt)
 				newImp = starImp;
 			}
 			else // slip : 動摩擦円錐に張り付け
-			{ 
+			{
 				if (deltaImpulseT > 1e-12f) newImp = starImp * (jtMaxD / deltaImpulseT);
 				else						newImp = Vector3();
 			}
@@ -498,13 +495,13 @@ void PhysicsSystem::ResolveVelocity(float dt)
 			if (rbA && invA > 0.0f)
 			{
 				rbA->SetVelocity(rbA->Velocity() - impulseTVector * invA);
-				rbA->SetAngularVelocity(rbA->AngularVelocity() - rbA->ApplyInvInertiaWorld(Vector3::CrossLH(rA, impulseTVector)));
-				sumTor += -rbA->ApplyInvInertiaWorld(Vector3::CrossLH(rA, impulseTVector));
+				rbA->SetAngularVelocity(rbA->AngularVelocity() - rbA->ApplyInvInertiaWorld(Vector3::Cross(rA, impulseTVector)));
+				sumTor += -rbA->ApplyInvInertiaWorld(Vector3::Cross(rA, impulseTVector));
 			}
 			if (rbB && invB > 0.0f)
 			{
 				rbB->SetVelocity(rbB->Velocity() + impulseTVector * invB);
-				rbB->SetAngularVelocity(rbB->AngularVelocity() + rbB->ApplyInvInertiaWorld(Vector3::CrossLH(rB, impulseTVector)));
+				rbB->SetAngularVelocity(rbB->AngularVelocity() + rbB->ApplyInvInertiaWorld(Vector3::Cross(rB, impulseTVector)));
 			}
 		}
 	}
@@ -545,7 +542,7 @@ void PhysicsSystem::CorrectPosition()
 		float maxPen = 0.0f;
 		for (int i = 0; i < c.m.count; i++)
 			maxPen = std::max(maxPen, c.m.points[i].penetration); // 最大の貫入深度を採用
-		
+
 		// slop で判定
 		const float C = std::max(0.0f, maxPen - Slop);
 		if (C <= 0.0f) continue;
@@ -553,8 +550,8 @@ void PhysicsSystem::CorrectPosition()
 		// じわっと直す
 		const float s = Baumgarte * C / (invA + invB); // 逆質量比
 		const Vector3 corrA = -n * (s * invA);
-		const Vector3 corrB =  n * (s * invB);
-		
+		const Vector3 corrB = n * (s * invB);
+
 		// 位置反映
 		auto anyNonZero = [](const Vector3& v) { return v.lengthSq() > 1e-12f; };
 		auto* tfA = c.A->Owner()->Transform();
@@ -592,7 +589,7 @@ void PhysicsSystem::IntegrationVelocity(float dt)
 			Vector3 axis = w * (1.0f / wlen); // 回転軸の単位ベクトル
 			float s = sinf(0.5f * theta), c = cosf(0.5f * theta);
 			Quaternion dq(axis.x * s, axis.y * s, axis.z * s, c); // クォータニオン生成
-			tfc->SetWorldRotation((tfc->WorldRotation()).normalized() * dq); // 回転（左手）
+			tfc->SetWorldRotation(dq * (tfc->WorldRotation()).normalized()); // 回転（右手）
 		}
 
 		// 慣性のワールド同期 -----

@@ -118,7 +118,7 @@ void Player::Update(float dt)
 
 	// ˆÚ“®ˆ— -----
 	if (!m_IsMove) return;
-	float value = 0.03f * dt;
+	float value = 0.10f * dt;
 
 	if (Keyboard_IsKeyDown(KK_LEFT))
 	{

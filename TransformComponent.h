@@ -211,7 +211,6 @@ public:
     // ----- ライフサイクル -----
     void OnAdded()  override 
     {
-        m_Value.parent = nullptr; // 使わない前提なので一応無効化
         m_LocalDirty = true;
         m_WorldDirty = true;
     }
